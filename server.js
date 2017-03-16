@@ -28,11 +28,13 @@ app.use(methodOverride());
 
 
 var gevolgdeSchema = new Schema({
-   IKLnr: Number,
-   oplCode: Number,
-   startdatum: Date,
-   einddatum: Date,
-   geslaagd: Boolean
+    //IKLnr: Number,
+    //oplCode: Number,
+    cursist: {type: Number, ref: 'Cursist'},
+    opleiding: {type: Number, ref: 'Opleiding'},
+    startdatum: Date,
+    einddatum: Date,
+    geslaagd: Boolean
 });
 
 var oplSchema = new Schema({
@@ -50,8 +52,7 @@ var curSchema = new Schema({
     adres: String,
     email: String,
     telnr: String,
-    foto: String,
-    //opleidingen: [{type: Number, ref: 'Gevolgde'}]
+    foto: String
 });
 
 
@@ -159,7 +160,7 @@ app.get('/api/opleidingen', function (req, res) {
 app.get('/api/opleidingen/:oplCode', function (req, res) {
 
     // use mongoose to get all todos in the database
-  
+
     Opleiding.findOne({oplCode: req.params.oplCode}, function (err, opleiding) {
 
         // if there is an error retrieving, send the error. nothing after res.send(err) will execute
@@ -204,6 +205,34 @@ app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
         });
     });
 });
+
+app.get('/api/gevolgde/:cursist_id', function (req, res) {
+
+    // use mongoose to get all todos in the database
+    Gevolgde.find({cursist: req.params.cursist_id}, function (err, gevolgde) {
+
+        // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+        if (err)
+            res.send(err);
+
+        res.json(gevolgde); // return all todos in JSON format
+        //res.json({"test":"jaja"});
+    });
+});
+
+app.post('/api/gevolgde/:cursist_id', function (req, res) {
+    Gevolgde.create({opleiding: req.body.oplCode, cursist: req.params.cursist_id}, function (err, gevolgde) {
+        if (err)
+            res.send(err);
+        Gevolgde.find(function (err, gevolgde) {
+            if (err)
+                res.send(err);
+            res.json(gevolgde);
+        });
+
+    });
+});
+
 // application -------------------------------------------------------------
 app.get('*.html', function (req, res) {
     res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)

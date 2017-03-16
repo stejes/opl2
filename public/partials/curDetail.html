@@ -22,4 +22,35 @@
         </li>
         
     </ul>
+    
+    <ul>
+        <li ng-repeat='cursus in gevolgde'>
+            {{ cursus.opleiding }} - {{ cursus.naam }}
+        </li>
+    </ul>
+    
+    <h2>Voeg een te volgen cursus toe: </h2>
+    <div id="todo-form" class="row">
+            <div class="col-sm-8 col-sm-offset-2 text-center">
+                <form>
+                    <div class="form-group">
+
+                        <!-- BIND THIS VALUE TO formData.text IN ANGULAR --> 
+                        <select class="form-control input-lg text-center" ng-model="formData.oplCode">
+                            <option ng-repeat='opleiding in opleidingen' value='{{ opleiding.oplCode }}'>{{ opleiding.naam }}
+                                
+                            </option>
+                        </select>
+                        
+          
+                    <input type="date" class="form-control input-lg text-center"  ng-model="formData.startdatum">
+                   
+             
+               </div>
+                    <!-- createToDo() WILL CREATE NEW TODOS -->
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="createGevolgde()">Voeg toe</button>
+                </form>
+            </div>
+        </div>
+    
 </div>

@@ -104,6 +104,31 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', functi
                 }, function (res) {
                     console.log('Error: ' + res.statusText);
                 });
+        $http.get('/api/opleidingen')
+                .then(function (res) {
+                    $scope.opleidingen = res.data;
+                    console.log(res);
+                }, function (res) {
+                    console.log('Error: ' + res.statusText);
+                });
+
+        $http.get('api/gevolgde/' + $routeParams.cursist_id)
+                .then(function (res) {
+                    $scope.gevolgde = res.data;
+                    console.log(res);
+                }, function (res) {
+                    console.log('Error: ' + res.statusText);
+                });
+
+        $scope.createGevolgde = function () {
+            $http.post('/api/gevolgde/' + $routeParams.cursist_id, $scope.formData)
+                    .then(function (res) {
+                        $scope.gevolgde = res.data;
+                        console.log(res);
+                    }, function (res) {
+                        console.log('Error: ' + res.statusText);
+                    });
+        };
 
     }]);
 
@@ -140,5 +165,18 @@ oplApp.controller('oplController', ['$scope', '$http', function ($scope, $http) 
                 console.log('Error: ' + res.statusText);
             };
         };
+
+    }]);
+
+oplApp.controller('oplDetailController', ['$scope', '$routeParams', '$http', function ($scope, $routeParams, $http) {
+        //$scope.formData = {};
+        console.log();
+        $http.get('/api/opleidingen/' + $routeParams.opleiding_id)
+                .then(function (res) {
+                    $scope.opleiding = res.data;
+                    console.log(res);
+                }, function (res) {
+                    console.log('Error: ' + res.statusText);
+                });
 
     }]);
