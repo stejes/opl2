@@ -10,6 +10,8 @@ var morgan = require('morgan');             // log requests to the console (expr
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 
+
+
 // configuration =================
 
 var connection = mongoose.connect('mongodb://localhost/eindtaak');     // connect to mongoDB database on modulus.io
@@ -23,11 +25,21 @@ app.use(bodyParser.json());                                     // parse applica
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride());
 
+
+
+var gevolgdeSchema = new Schema({
+   IKLnr: Number,
+   oplCode: Number,
+   startdatum: Date,
+   einddatum: Date,
+   geslaagd: Boolean
+});
+
 var oplSchema = new Schema({
     oplCode: Number,
-    oplNaam: String,
+    naam: String,
     beschrijving: String,
-    maxDuur: Number
+    duurtijd: Number
 });
 
 var curSchema = new Schema({
@@ -39,16 +51,17 @@ var curSchema = new Schema({
     email: String,
     telnr: String,
     foto: String,
-    opleidingen: [{type: Number, ref:'Opleiding'}]
+    //opleidingen: [{type: Number, ref: 'Gevolgde'}]
 });
 
 
 
-curSchema.plugin(autoIncrement.plugin,{model:'Cursist', field:'IKLnr'});
-curSchema.plugin(autoIncrement.plugin,{model:'Opleiding', field:'oplCode'});
+curSchema.plugin(autoIncrement.plugin, {model: 'Cursist', field: 'IKLnr'});
+//curSchema.plugin(autoIncrement.plugin, {model: 'Opleiding', field: 'oplCode'});
 //define model
 var Cursist = mongoose.model('Cursist', curSchema, "cursisten");
 var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
+var Gevolgde = mongoose.model('Gevolgde', gevolgdeSchema, "gevolgde");
 
 
 // routes ======================================================================
@@ -71,12 +84,29 @@ app.get('/api/cursisten', function (req, res) {
     });
 });
 
+app.get('/api/cursisten/:cursist_id', function (req, res) {
+
+    Cursist.findOne({IKLnr: req.params.cursist_id},
+            function (err, cursist) {
+
+
+                // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+                if (err || !cursist) {
+                    res.send(err);
+                } else {
+                    res.json(cursist);
+                    //res.json({"test":"jaja"});
+                }
+
+            });
+});
+
 // create todo and send back all todos after creation
 app.post('/api/cursisten', function (req, res) {
 
-    // create a todo, information comes from AJAX request from Angular
+// create a todo, information comes from AJAX request from Angular
     Cursist.create({
-        //IKLnr: 11111,
+//IKLnr: 11111,
         rijksregNr: req.body.rijksregNr,
         familienaam: req.body.familienaam,
         voornaam: req.body.voornaam,
@@ -88,7 +118,6 @@ app.post('/api/cursisten', function (req, res) {
     }, function (err, cursist) {
         if (err)
             res.send(err);
-
         // get and return all the todos after you create another
         Cursist.find(function (err, cursisten) {
             if (err)
@@ -96,9 +125,8 @@ app.post('/api/cursisten', function (req, res) {
             res.json(cursisten);
         });
     });
-
-});
-
+}
+);
 // delete a todo
 app.delete('/api/cursisten/:cursist_id', function (req, res) {
     Cursist.remove({
@@ -106,11 +134,10 @@ app.delete('/api/cursisten/:cursist_id', function (req, res) {
     }, function (err, cursist) {
         if (err)
             res.send(err);
-
         // get and return all the todos after you create another
         Cursist.find(function (err, cursisten) {
             if (err)
-                res.send(err)
+                res.send(err);
             res.json(cursisten);
         });
     });
@@ -125,26 +152,23 @@ app.get('/api/opleidingen', function (req, res) {
         // if there is an error retrieving, send the error. nothing after res.send(err) will execute
         if (err)
             res.send(err);
-
         res.json(opleidingen); // return all todos in JSON format
         //res.json({"test":"jaja"});
     });
 });
-
-app.get('/api/opleidingen/:opleiding_id', function (req, res) {
+app.get('/api/opleidingen/:oplCode', function (req, res) {
 
     // use mongoose to get all todos in the database
-    Opleiding.find({'id': req.params.opleiding_id}, function (err, opleiding) {
+  
+    Opleiding.findOne({oplCode: req.params.oplCode}, function (err, opleiding) {
 
         // if there is an error retrieving, send the error. nothing after res.send(err) will execute
         if (err)
             res.send(err);
-
         res.json(opleiding); // return all todos in JSON format
         //res.json({"test":"jaja"});
     });
 });
-
 // create todo and send back all todos after creation
 app.post('/api/opleidingen', function (req, res) {
 
@@ -155,7 +179,6 @@ app.post('/api/opleidingen', function (req, res) {
     }, function (err, opleiding) {
         if (err)
             res.send(err);
-
         // get and return all the todos after you create another
         Opleiding.find(function (err, opleidingen) {
             if (err)
@@ -163,9 +186,7 @@ app.post('/api/opleidingen', function (req, res) {
             res.json(opleidingen);
         });
     });
-
 });
-
 // delete a todo
 app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
     Opleiding.remove({
@@ -173,22 +194,19 @@ app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
     }, function (err, opleiding) {
         if (err)
             res.send(err);
-
         // get and return all the todos after you create another
         Opleiding.find(function (err, opleidingen) {
             if (err)
-                res.send(err)
+                res.send(err);
             res.json(opleidingen);
         });
     });
 });
-
-
- // application -------------------------------------------------------------
-    app.get('*', function(req, res) {
-        res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
-    });
-
+// application -------------------------------------------------------------
+app.get('*.html', function (req, res) {
+    res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+});
 // listen (start app with node server.js) ======================================
 app.listen(8080);
 console.log("App listening on port 8080");
+console.log(__dirname);
