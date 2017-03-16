@@ -174,8 +174,10 @@ app.post('/api/opleidingen', function (req, res) {
 
     // create a todo, information comes from AJAX request from Angular
     Opleiding.create({
-        test: req.body.test,
-        done: false
+        oplCode: req.body.oplCode,
+        naam: req.body.naam,
+        beschrijving: req.body.beschrijving,
+        duurtijd: req.body.duurtijd
     }, function (err, opleiding) {
         if (err)
             res.send(err);

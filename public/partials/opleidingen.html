@@ -12,10 +12,10 @@
                 <!-- LOOP OVER THE TODOS IN $scope.todos -->
                 <div class="checkbox" ng-repeat="opleiding in opleidingen">
                     
-                        <button name="removeBtn" class="btn btn-default" ng-click="deleteCur(opleiding._id)">Verwijder</button>
-                          <a name="detailBtn" class="btn btn-default" href="/#!/opleidingen/{{ opleiding.IKLnr }}">Details</a>
+                        <button name="removeBtn" class="btn btn-default" ng-click="deleteOpl(opleiding._id)">Verwijder</button>
+                          <a name="detailBtn" class="btn btn-default" href="/#!/opleidingen/{{ opleiding.oplCode }}">Details</a>
                         <!--<span ng-repeat="opleiding in opleiding.opleidingen">({{ opleiding }})</span>-->
-                         {{ opleiding.familienaam + " " + opleiding.voornaam }}
+                         {{ opleiding.naam }}
                    
                 </div>
 
@@ -29,18 +29,16 @@
                     <div class="form-group">
 
                         <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-                        <input type="text" class="form-control input-lg text-center" placeholder="familienaam" ng-model="formData.familienaam">
-                         <input type="text" class="form-control input-lg text-center" placeholder="voornaam" ng-model="formData.voornaam">
+                        <input type="text" class="form-control input-lg text-center" placeholder="opleidingscode" ng-model="formData.oplCode">
+                         <input type="text" class="form-control input-lg text-center" placeholder="naam" ng-model="formData.naam">
           
-                    <input type="text" class="form-control input-lg text-center" placeholder="adres" ng-model="formData.adres">
+                         <textarea class="form-control input-lg text-center" placeholder="beschrijving" ng-model="formData.beschrijving"></textarea>
                    
-              <input type="text" class="form-control input-lg text-center" placeholder="email" ng-model="formData.email">
-               <input type="text" class="form-control input-lg text-center" placeholder="foto" ng-model="formData.foto">
-                <!--<input type="text" class="form-control input-lg text-center" placeholder="opleiding" ng-model="formData.opleidingen">-->
-                  
+              <input type="text" class="form-control input-lg text-center" placeholder="duurtijd" ng-model="formData.duurtijd">
+               
                </div>
                     <!-- createToDo() WILL CREATE NEW TODOS -->
-                    <button type="submit" class="btn btn-primary btn-lg" ng-click="createCur()">Add</button>
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="createOpl()">Add</button>
                 </form>
             </div>
         </div>

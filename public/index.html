@@ -8,13 +8,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Optimize mobile viewport -->
 
-    <title>Node/Angular Todo App</title>
+    <title>Node/Angular App voor cursisten en de opleidingen die ze volgen</title>
 
     <!-- SCROLLS -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"><!-- load bootstrap -->
     <style>
         html                    { overflow-y:scroll; }
-        body                    { padding-top:50px; }
+      
         #todo-list              { margin-bottom:30px; }
     </style>
  
@@ -29,6 +29,14 @@
 </head>
 <!-- SET THE CONTROLLER AND GET ALLang -->
 <body >
+    <nav class='navbar navbar-default'>
+        <div class='container-fluid'>
+            <ul class='nav navbar-nav'>
+                <li><a href='#!/cursisten'>Cursisten</a></li>
+                  <li><a href='#!/opleidingen'>Opleidingen</a></li>
+            </ul>
+        </div>
+    </nav>
     <div class="" ng-view></div>
     
   

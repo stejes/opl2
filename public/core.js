@@ -3,7 +3,10 @@ var oplApp = angular.module('oplApp', ['ngRoute']);
 
 oplApp.config(function ($routeProvider) {
     $routeProvider
-
+            .when('/opleidingen/:opleiding_id', {
+                controller: "oplDetailController",
+                templateUrl: "partials/oplDetail.html"
+            })
             .when('/opleidingen', {
                 controller: "oplController",
                 templateUrl: "partials/opleidingen.html"
@@ -101,5 +104,41 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', functi
                 }, function (res) {
                     console.log('Error: ' + res.statusText);
                 });
+
+    }]);
+
+oplApp.controller('oplController', ['$scope', '$http', function ($scope, $http) {
+        $scope.formData = {};
+
+        $http.get('/api/opleidingen')
+                .then(function (res) {
+                    $scope.opleidingen = res.data;
+                    console.log(res);
+                }, function (res) {
+                    console.log('Error: ' + res.statusText);
+                });
+
+        // when submitting the add form, send the text to the node API
+        $scope.createOpl = function () {
+            $http.post('/api/opleidingen', $scope.formData)
+                    .then(function (res) {
+                        $scope.formData = {}; // clear the form so our user is ready to enter another
+                        $scope.opleidingen = res.data;
+                        console.log(res);
+                    }), function (res) {
+                console.log('Error: ' + res.statusText);
+            };
+        };
+
+        // delete a todo after checking it
+        $scope.deleteOpl = function (id) {
+            $http.delete('/api/opleidingen/' + id)
+                    .then(function (res) {
+                        $scope.opleidingen = res.data;
+                        console.log(res.data);
+                    }), function (res) {
+                console.log('Error: ' + res.statusText);
+            };
+        };
 
     }]);
