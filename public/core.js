@@ -112,18 +112,18 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', functi
                     console.log('Error: ' + res.statusText);
                 });
 
-        $http.get('api/gevolgde/' + $routeParams.cursist_id)
+        /*$http.get('api/gevolgde/' + $routeParams.cursist_id)
                 .then(function (res) {
                     $scope.gevolgde = res.data;
                     console.log(res);
                 }, function (res) {
                     console.log('Error: ' + res.statusText);
-                });
+                });*/
 
         $scope.createGevolgde = function () {
             $http.post('/api/gevolgde/' + $routeParams.cursist_id, $scope.formData)
                     .then(function (res) {
-                        $scope.gevolgde = res.data;
+                        $scope.cursist = res.data;
                         console.log(res);
                     }, function (res) {
                         console.log('Error: ' + res.statusText);

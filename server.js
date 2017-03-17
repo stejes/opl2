@@ -44,15 +44,21 @@ var oplSchema = new Schema({
     duurtijd: Number
 });
 
+
 var curSchema = new Schema({
-    IKLnr: Number,
+    IKLnr: {type: Number, index: {unique: true, dropDups: true}},
     rijksregNr: String,
     familienaam: String,
     voornaam: String,
     adres: String,
     email: String,
     telnr: String,
-    foto: String
+    foto: String,
+    opleidingen: [{
+            opleidinginfo: oplSchema,
+            startdatum: Date,
+            einddatum: Date,
+            geslaagd: Boolean}]
 });
 
 
@@ -221,16 +227,49 @@ app.get('/api/gevolgde/:cursist_id', function (req, res) {
 });
 
 app.post('/api/gevolgde/:cursist_id', function (req, res) {
-    Gevolgde.create({opleiding: req.body.oplCode, cursist: req.params.cursist_id}, function (err, gevolgde) {
-        if (err)
-            res.send(err);
-        Gevolgde.find(function (err, gevolgde) {
-            if (err)
-                res.send(err);
-            res.json(gevolgde);
-        });
+    /*Gevolgde.create({opleiding: req.body.oplCode, cursist: req.params.cursist_id}, function (err, gevolgdes) {
+     if (err) {
+     res.send(err);
+     } else {
+     Gevolgde.find(function (err, gevolgde) {
+     if (err) {
+     res.send(err);
+     } else {
+     res.json(gevolgde);
+     }
+     });
+     }
+     
+     });*/
+    
+    Opleiding.findOne({oplCode: req.body.oplCode}, function(err, opleiding){
+        
+        if(err)
+            console.log(err);
+        
+        var query = {'IKLnr': req.params.cursist_id};
+        Cursist.findOneAndUpdate(
+            query,
+            {$push: {"opleidingen": {"opleidinginfo": opleiding, "startdatum": Date.now(), "einddatum": Date.now(), geslaagd: false}}}, {safe: true, upsert: true},
+            function (err, cursisten) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    Cursist.findOne({IKLnr: req.params.cursist_id},
+                            function (err, cursist) {
+                                if (err) {
+                                    console.log(err);
 
+                                } else {
+                                    console.log(cursist);
+                                    res.json(cursist);
+                                }
+                            });
+                }
+            }
+    )
     });
+    
 });
 
 // application -------------------------------------------------------------

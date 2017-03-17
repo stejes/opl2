@@ -22,10 +22,15 @@
         </li>
         
     </ul>
-    
+    <h2>Gevolgde opleidingen: </h2>
     <ul>
-        <li ng-repeat='cursus in gevolgde'>
-            {{ cursus.opleiding }} - {{ cursus.naam }}
+        <li ng-repeat='opleiding in cursist.opleidingen'>
+            <ul>
+                <li>{{ opleiding.opleidinginfo.oplCode }} - {{ opleiding.opleidinginfo.naam }}</li>
+                <li>Begindatum: {{ opleiding.startdatum }}</li>
+                <li>Einddatum: {{ opleiding.einddatum }}</li>
+                <li>Geslaagd: {{ opleiding.geslaagd }}</li>
+            </ul>
         </li>
     </ul>
     
