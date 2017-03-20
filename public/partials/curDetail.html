@@ -27,8 +27,8 @@
         <li ng-repeat='opleiding in cursist.opleidingen'>
             <ul>
                 <li>{{ opleiding.opleidinginfo.oplCode }} - {{ opleiding.opleidinginfo.naam }}</li>
-                <li>Begindatum: {{ opleiding.startdatum }}</li>
-                <li>Einddatum: {{ opleiding.einddatum }}</li>
+                <li>Begindatum: {{ opleiding.startdatum | date : 'd-MM-yyyy' : '+0100' }}</li>
+                <li>Einddatum: {{ opleiding.einddatum | date : 'd-MM-yyyy' : '+0100' }}</li>
                 <li>Geslaagd: {{ opleiding.geslaagd }}</li>
             </ul>
         </li>
@@ -48,7 +48,7 @@
                         </select>
                         
           
-                    <input type="date" class="form-control input-lg text-center"  ng-model="formData.startdatum">
+                    <input id="startdate" type="date" class="form-control input-lg text-center"  ng-model="formData.startdatum">
                    
              
                </div>
@@ -59,3 +59,4 @@
         </div>
     
 </div>
+ 

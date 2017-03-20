@@ -1,46 +1,50 @@
 <div class="container" >
 
-        <!-- HEADER AND TODO COUNT -->
-        <div class="jumbotron text-center">
-            <h1>Bestaande opleidingen <span class="label label-info">{{ opleidingen.length }}</span></h1>
-        </div>
-
-        <!-- TODO LIST -->
-        <div id="todo-list" class="row">
-            <div class="col-sm-4 col-sm-offset-4">
-
-                <!-- LOOP OVER THE TODOS IN $scope.todos -->
-                <div class="checkbox" ng-repeat="opleiding in opleidingen">
-                    
-                        <button name="removeBtn" class="btn btn-default" ng-click="deleteOpl(opleiding._id)">Verwijder</button>
-                          <a name="detailBtn" class="btn btn-default" href="/#!/opleidingen/{{ opleiding.oplCode }}">Details</a>
-                        <!--<span ng-repeat="opleiding in opleiding.opleidingen">({{ opleiding }})</span>-->
-                         {{ opleiding.naam }}
-                   
-                </div>
-
-            </div>
-        </div>
-
-        <!-- FORM TO CREATE TODOS -->
-        <div id="todo-form" class="row">
-            <div class="col-sm-8 col-sm-offset-2 text-center">
-                <form>
-                    <div class="form-group">
-
-                        <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-                        <input type="text" class="form-control input-lg text-center" placeholder="opleidingscode" ng-model="formData.oplCode">
-                         <input type="text" class="form-control input-lg text-center" placeholder="naam" ng-model="formData.naam">
-          
-                         <textarea class="form-control input-lg text-center" placeholder="beschrijving" ng-model="formData.beschrijving"></textarea>
-                   
-              <input type="text" class="form-control input-lg text-center" placeholder="duurtijd" ng-model="formData.duurtijd">
-               
-               </div>
-                    <!-- createToDo() WILL CREATE NEW TODOS -->
-                    <button type="submit" class="btn btn-primary btn-lg" ng-click="createOpl()">Add</button>
-                </form>
-            </div>
-        </div>
-
+    <!-- HEADER AND TODO COUNT -->
+    <div class="jumbotron text-center">
+        <h1>Bestaande opleidingen <span class="label label-info">{{ opleidingen.length}}</span></h1>
     </div>
+    <select class="form-control input-lg text-center" ng-model="selectedOpl">
+        <option  ng-repeat='opleiding in opleidingen' value='{{ opleiding.oplCode}}'>{{ opleiding.naam}}
+
+        </option>
+    </select>
+    <!-- TODO LIST -->
+    <div id="todo-list" class="row">
+        <div class="col-sm-4 col-sm-offset-4">
+
+            <!-- LOOP OVER THE TODOS IN $scope.todos -->
+            <div class="checkbox" ng-repeat="opleiding in opleidingen | filter: selectedOpl ">
+
+                <button name="removeBtn" class="btn btn-default" ng-click="deleteOpl(opleiding._id)">Verwijder</button>
+                <a name="detailBtn" class="btn btn-default" href="/#!/opleidingen/{{ opleiding.oplCode}}">Details</a>
+                <!--<span ng-repeat="opleiding in opleiding.opleidingen">({{ opleiding }})</span>-->
+                {{ opleiding.naam}}
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FORM TO CREATE TODOS -->
+    <div id="todo-form" class="row">
+        <div class="col-sm-8 col-sm-offset-2 text-center">
+            <form>
+                <div class="form-group">
+
+                    <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+                    <input type="text" class="form-control input-lg text-center" placeholder="opleidingscode" ng-model="formData.oplCode">
+                    <input type="text" class="form-control input-lg text-center" placeholder="naam" ng-model="formData.naam">
+
+                    <textarea class="form-control input-lg text-center" placeholder="beschrijving" ng-model="formData.beschrijving"></textarea>
+
+                    <input type="text" class="form-control input-lg text-center" placeholder="duurtijd" ng-model="formData.duurtijd">
+
+                </div>
+                <!-- createToDo() WILL CREATE NEW TODOS -->
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="createOpl()">Add</button>
+            </form>
+        </div>
+    </div>
+
+</div>

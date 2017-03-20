@@ -33,6 +33,14 @@ oplApp.controller('mainController', ['$scope', '$http', function ($scope, $http)
                     console.log('Error: ' + res.statusText);
                 });
 
+        $http.get('/api/opleidingen')
+                .then(function (res) {
+                    $scope.opleidingen = res.data;
+                    console.log(res);
+                }, function (res) {
+                    console.log('Error: ' + res.statusText);
+                });
+
         // when submitting the add form, send the text to the node API
         $scope.createCur = function () {
             $http.post('/api/cursisten', $scope.formData)
@@ -56,41 +64,7 @@ oplApp.controller('mainController', ['$scope', '$http', function ($scope, $http)
             };
         };
 
-        /*
-         // when landing on the page, get all todos and show them
-         $http.get('/api/opleidingen')
-         .success(function (data) {
-         $scope.todos = data;
-         console.log(data);
-         })
-         .error(function (data) {
-         console.log('Error: ' + data);
-         });
-         
-         // when submitting the add form, send the text to the node API
-         $scope.createOpl = function () {
-         $http.post('/api/opleidingen', $scope.formData)
-         .success(function (data) {
-         $scope.formData = {}; // clear the form so our user is ready to enter another
-         $scope.opleidingen = data;
-         console.log(data);
-         })
-         .error(function (data) {
-         console.log('Error: ' + data);
-         });
-         };
-         
-         // delete a todo after checking it
-         $scope.deleteOpl = function (id) {
-         $http.delete('/api/opleidingen/' + id)
-         .success(function (data) {
-         $scope.opleidingen = data;
-         console.log(data);
-         })
-         .error(function (data) {
-         console.log('Error: ' + data);
-         });
-         };*/
+
 
     }]);
 
@@ -112,13 +86,7 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', functi
                     console.log('Error: ' + res.statusText);
                 });
 
-        /*$http.get('api/gevolgde/' + $routeParams.cursist_id)
-                .then(function (res) {
-                    $scope.gevolgde = res.data;
-                    console.log(res);
-                }, function (res) {
-                    console.log('Error: ' + res.statusText);
-                });*/
+
 
         $scope.createGevolgde = function () {
             $http.post('/api/gevolgde/' + $routeParams.cursist_id, $scope.formData)

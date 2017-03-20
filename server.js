@@ -27,7 +27,7 @@ app.use(methodOverride());
 
 
 
-var gevolgdeSchema = new Schema({
+/*var gevolgdeSchema = new Schema({
     //IKLnr: Number,
     //oplCode: Number,
     cursist: {type: Number, ref: 'Cursist'},
@@ -35,7 +35,7 @@ var gevolgdeSchema = new Schema({
     startdatum: Date,
     einddatum: Date,
     geslaagd: Boolean
-});
+});*/
 
 var oplSchema = new Schema({
     oplCode: Number,
@@ -46,7 +46,7 @@ var oplSchema = new Schema({
 
 
 var curSchema = new Schema({
-    IKLnr: {type: Number, index: {unique: true, dropDups: true}},
+    IKLnr: {type: Number/*, index: {unique: true, dropDups: true}*/},
     rijksregNr: String,
     familienaam: String,
     voornaam: String,
@@ -68,7 +68,7 @@ curSchema.plugin(autoIncrement.plugin, {model: 'Cursist', field: 'IKLnr'});
 //define model
 var Cursist = mongoose.model('Cursist', curSchema, "cursisten");
 var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
-var Gevolgde = mongoose.model('Gevolgde', gevolgdeSchema, "gevolgde");
+//var Gevolgde = mongoose.model('Gevolgde', gevolgdeSchema, "gevolgde");
 
 
 // routes ======================================================================
@@ -110,7 +110,7 @@ app.get('/api/cursisten/:cursist_id', function (req, res) {
 
 // create todo and send back all todos after creation
 app.post('/api/cursisten', function (req, res) {
-
+//console.log(req);
 // create a todo, information comes from AJAX request from Angular
     Cursist.create({
 //IKLnr: 11111,
@@ -120,15 +120,19 @@ app.post('/api/cursisten', function (req, res) {
         adres: req.body.adres,
         email: req.body.email,
         telnr: req.body.telnr,
-        foto: req.body.foto,
-        opleidingen: req.body.opleidingen
+        foto: req.body.foto
+        //opleidingen: req.body.opleidingen
     }, function (err, cursist) {
         if (err)
-            res.send(err);
+        {
+            console.log(err);
+            return res.send(err);
+        }
+        //console.log(err);
         // get and return all the todos after you create another
         Cursist.find(function (err, cursisten) {
             if (err)
-                res.send(err);
+                return res.send(err);
             res.json(cursisten);
         });
     });
@@ -140,11 +144,12 @@ app.delete('/api/cursisten/:cursist_id', function (req, res) {
         _id: req.params.cursist_id
     }, function (err, cursist) {
         if (err)
-            res.send(err);
+            return res.send(err);
+
         // get and return all the todos after you create another
         Cursist.find(function (err, cursisten) {
             if (err)
-                res.send(err);
+                return res.send(err);
             res.json(cursisten);
         });
     });
@@ -241,35 +246,39 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
      }
      
      });*/
-    
-    Opleiding.findOne({oplCode: req.body.oplCode}, function(err, opleiding){
-        
-        if(err)
-            console.log(err);
-        
-        var query = {'IKLnr': req.params.cursist_id};
-        Cursist.findOneAndUpdate(
-            query,
-            {$push: {"opleidingen": {"opleidinginfo": opleiding, "startdatum": Date.now(), "einddatum": Date.now(), geslaagd: false}}}, {safe: true, upsert: true},
-            function (err, cursisten) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    Cursist.findOne({IKLnr: req.params.cursist_id},
-                            function (err, cursist) {
-                                if (err) {
-                                    console.log(err);
 
-                                } else {
-                                    console.log(cursist);
-                                    res.json(cursist);
-                                }
-                            });
+    Opleiding.findOne({oplCode: req.body.oplCode}, function (err, opleiding) {
+
+        if (err)
+            console.log(err);
+
+        var query = {'IKLnr': req.params.cursist_id};
+        var startdate = Date.parse(req.body.startdatum);
+
+        var enddate = startdate + parseInt(opleiding.duurtijd) * 7 * 24 * 60 * 60 * 1000;
+
+        Cursist.findOneAndUpdate(
+                query,
+                {$push: {"opleidingen": {"opleidinginfo": opleiding, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {safe: true, upsert: true},
+                function (err, cursisten) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        Cursist.findOne({IKLnr: req.params.cursist_id},
+                                function (err, cursist) {
+                                    if (err) {
+                                        console.log(err);
+
+                                    } else {
+                                        console.log(cursist);
+                                        res.json(cursist);
+                                    }
+                                });
+                    }
                 }
-            }
-    )
+        )
     });
-    
+
 });
 
 // application -------------------------------------------------------------
