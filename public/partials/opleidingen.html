@@ -4,17 +4,13 @@
     <div class="jumbotron text-center">
         <h1>Bestaande opleidingen <span class="label label-info">{{ opleidingen.length}}</span></h1>
     </div>
-    <select class="form-control input-lg text-center" ng-model="selectedOpl">
-        <option  ng-repeat='opleiding in opleidingen' value='{{ opleiding.oplCode}}'>{{ opleiding.naam}}
-
-        </option>
-    </select>
+   
     <!-- TODO LIST -->
     <div id="todo-list" class="row">
         <div class="col-sm-4 col-sm-offset-4">
 
             <!-- LOOP OVER THE TODOS IN $scope.todos -->
-            <div class="checkbox" ng-repeat="opleiding in opleidingen | filter: selectedOpl ">
+            <div class="checkbox" ng-repeat="opleiding in opleidingen">
 
                 <button name="removeBtn" class="btn btn-default" ng-click="deleteOpl(opleiding._id)">Verwijder</button>
                 <a name="detailBtn" class="btn btn-default" href="/#!/opleidingen/{{ opleiding.oplCode}}">Details</a>

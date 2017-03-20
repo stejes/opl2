@@ -15,7 +15,7 @@
             <div class="col-sm-4 col-sm-offset-4">
 
                 <!-- LOOP OVER THE TODOS IN $scope.todos -->
-                <div class="checkbox" ng-repeat="cursist in cursisten | filter:selectedOpl">
+                <div class="checkbox" ng-repeat="cursist in cursisten | filterOpl:selectedOpl">
                     
                         <button name="removeBtn" class="btn btn-default" ng-click="deleteCur(cursist._id)">Verwijder</button>
                           <a name="detailBtn" class="btn btn-default" href="/#!/cursisten/{{ cursist.IKLnr }}">Details</a>
