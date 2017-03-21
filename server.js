@@ -45,6 +45,12 @@ var oplSchema = new Schema({
 });
 
 
+
+//curSchema.plugin(autoIncrement.plugin, {model: 'Opleiding', field: 'oplCode'});
+//define model
+
+var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
+//var Gevolgde = mongoose.model('Gevolgde', gevolgdeSchema, "gevolgde");
 var curSchema = new Schema({
     IKLnr: {type: Number/*, index: {unique: true, dropDups: true}*/},
     rijksregNr: String,
@@ -55,21 +61,15 @@ var curSchema = new Schema({
     telnr: String,
     foto: String,
     opleidingen: [{
-            opleidinginfo: oplSchema,
+            opleidinginfo: {type: Schema.Types.ObjectId, ref: oplSchema},
             startdatum: Date,
             einddatum: Date,
             geslaagd: Boolean}]
 });
-
+var Cursist = mongoose.model('Cursist', curSchema, "cursisten");
 
 
 curSchema.plugin(autoIncrement.plugin, {model: 'Cursist', field: 'IKLnr'});
-//curSchema.plugin(autoIncrement.plugin, {model: 'Opleiding', field: 'oplCode'});
-//define model
-var Cursist = mongoose.model('Cursist', curSchema, "cursisten");
-var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
-//var Gevolgde = mongoose.model('Gevolgde', gevolgdeSchema, "gevolgde");
-
 
 // routes ======================================================================
 
@@ -92,51 +92,61 @@ app.get('/api/cursisten', function (req, res) {
 });
 
 app.get('/api/cursisten/:cursist_id', function (req, res) {
+Cursist
+        .findOne({IKLnr: req.params.cursist_id})
+        .populate({
+            path: 'opleidingen.opleidinginfo',
+            model: 'Opleiding'
+        })
 
-    Cursist.findOne({IKLnr: req.params.cursist_id},
-            function (err, cursist) {
-
-
-                // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-                if (err || !cursist) {
-                    res.send(err);
-                } else {
-                    res.json(cursist);
-                    //res.json({"test":"jaja"});
-                }
-
-            });
+        .exec(function (err, cursist) {
+        if (err) return handleError(err);
+                console.log('The creator is %s', cursist.opleidingen);
+                /*Cursist.findOne({IKLnr: req.params.cursist_id},
+                 function (err, cursist) {
+                 
+                 
+                 // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+                 if (err || !cursist) {
+                 res.send(err);
+                 } else {
+                 res.json(cursist);
+                 //res.json({"test":"jaja"});
+                 }
+                 
+                 });*/
+            res.json(cursist);
+        });
 });
-
 // create todo and send back all todos after creation
 app.post('/api/cursisten', function (req, res) {
 //console.log(req);
 // create a todo, information comes from AJAX request from Angular
-    Cursist.create({
+Cursist.create({
 //IKLnr: 11111,
-        rijksregNr: req.body.rijksregNr,
+rijksregNr: req.body.rijksregNr,
         familienaam: req.body.familienaam,
         voornaam: req.body.voornaam,
         adres: req.body.adres,
         email: req.body.email,
         telnr: req.body.telnr,
         foto: req.body.foto
-                //opleidingen: req.body.opleidingen
-    }, function (err, cursist) {
-        /*if (err)
-        {
-            console.log(err);
-            return res.send(err);
-        }
-        //console.log(err);
-        // get and return all the todos after you create another
-        Cursist.find(function (err, cursisten) {
-            if (err)
-                return res.send(err);
-            res.json(cursisten);
-        });*/
-    res.json(cursist);
-    });
+        //opleidingen: req.body.opleidingen
+}, function (err, cursist) {
+/*if (err)
+ {
+ console.log(err);
+ return res.send(err);
+ }
+ //console.log(err);
+ // get and return all the todos after you create another
+ Cursist.find(function (err, cursisten) {
+ if (err)
+ return res.send(err);
+ res.json(cursisten);
+ });*/
+res.json(cursist);
+});
 }
 );
 // delete a todo
@@ -146,13 +156,8 @@ app.delete('/api/cursisten/:cursist_id', function (req, res) {
     }, function (err, cursist) {
         if (err)
             return res.send(err);
-
         // get and return all the todos after you create another
-        Cursist.find(function (err, cursisten) {
-            if (err)
-                return res.send(err);
-            res.json(cursisten);
-        });
+        res.json(cursist);
     });
 });
 // 
@@ -195,11 +200,7 @@ app.post('/api/opleidingen', function (req, res) {
         if (err)
             res.send(err);
         // get and return all the todos after you create another
-        Opleiding.find(function (err, opleidingen) {
-            if (err)
-                res.send(err);
-            res.json(opleidingen);
-        });
+        res.json(opleiding);
     });
 });
 // delete a todo
@@ -210,14 +211,9 @@ app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
         if (err)
             res.send(err);
         // get and return all the todos after you create another
-        Opleiding.find(function (err, opleidingen) {
-            if (err)
-                res.send(err);
-            res.json(opleidingen);
-        });
+        res.json(opleiding);
     });
 });
-
 /*app.get('/api/gevolgde/:cursist_id', function (req, res) {
  
  // use mongoose to get all todos in the database
@@ -240,17 +236,16 @@ app.get('/api/cursisten/:cursist_id/gevolgde/:oplCode', function (req, res) {
             if (cursist.opleidingen[i].opleidinginfo.oplCode == req.params.oplCode) {
                 //res.json(cursist);//hier bezig, als check of opl mag toegevoegd worden of niet
                 found = true;
-            } 
+            }
         }
-        if(found){
+        if (found) {
             res.json(cursist);
-        }else{
+        } else {
             console.log("nope");
             res.json({duplicate: "no"});
         }
     });
 });
-
 app.delete('/api/cursisten/:cursist_id/gevolgde/:opl_id', function (req, res) {
     Cursist.findByIdAndUpdate(
             req.params.cursist_id,
@@ -262,7 +257,6 @@ app.delete('/api/cursisten/:cursist_id/gevolgde/:opl_id', function (req, res) {
                         function (err, cursist) {
                             if (err) {
                                 console.log(err);
-
                             } else {
                                 console.log(cursist);
                                 res.json(cursist);
@@ -291,15 +285,12 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
 
         if (err)
             console.log(err);
-
         var query = {'IKLnr': req.params.cursist_id};
         var startdate = Date.parse(req.body.startdatum);
-
         var enddate = startdate + parseInt(opleiding.duurtijd) * 7 * 24 * 60 * 60 * 1000;
-
         Cursist.findOneAndUpdate(
                 query,
-                {$push: {"opleidingen": {"opleidinginfo": opleiding, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {safe: true, upsert: true},
+                {$push: {"opleidingen": {"opleidinginfo": opleiding._id, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {safe: true, upsert: true},
                 function (err, cursisten) {
                     if (err) {
                         console.log(err);
@@ -308,7 +299,6 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
                                 function (err, cursist) {
                                     if (err) {
                                         console.log(err);
-
                                     } else {
                                         console.log(cursist);
                                         res.json(cursist);
@@ -318,9 +308,7 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
                 }
         )
     });
-
 });
-
 // application -------------------------------------------------------------
 app.get('*.html', function (req, res) {
     res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
