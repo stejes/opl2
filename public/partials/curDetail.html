@@ -27,13 +27,16 @@
         <li ng-repeat='opleiding in cursist.opleidingen'>
             <ul>
                 <li>{{ opleiding.opleidinginfo.oplCode }} - {{ opleiding.opleidinginfo.naam }}</li>
-                <li>Begindatum: {{ opleiding.startdatum | date : 'd-MM-yyyy' : '+0100' }}</li>
-                <li>Einddatum: {{ opleiding.einddatum | date : 'd-MM-yyyy' : '+0100' }}</li>
+                <li>Begindatum: {{ opleiding.startdatum | date : 'd-MM-yyyy' : '+0200' }}</li>
+                <li>Einddatum: {{ opleiding.einddatum | date : 'd-MM-yyyy' : '+0200' }}</li>
                 <li>Geslaagd: {{ opleiding.geslaagd }}</li>
+                <li><button name="removeBtn" class="btn btn-default" ng-click="deleteGevolgde(cursist._id, opleiding._id)">Verwijder</button></li>
             </ul>
+             
         </li>
     </ul>
     
+    <div ng-if="melding != ''" class="alert alert-danger">{{ melding }}<a href='#!/cursisten/{{ cursist.IKLnr }}' class="close" data-dismiss="alert" ng-click="emptyAlert">&times;</a></div>
     <h2>Voeg een te volgen cursus toe: </h2>
     <div id="todo-form" class="row">
             <div class="col-sm-8 col-sm-offset-2 text-center">

@@ -28,14 +28,14 @@ app.use(methodOverride());
 
 
 /*var gevolgdeSchema = new Schema({
-    //IKLnr: Number,
-    //oplCode: Number,
-    cursist: {type: Number, ref: 'Cursist'},
-    opleiding: {type: Number, ref: 'Opleiding'},
-    startdatum: Date,
-    einddatum: Date,
-    geslaagd: Boolean
-});*/
+ //IKLnr: Number,
+ //oplCode: Number,
+ cursist: {type: Number, ref: 'Cursist'},
+ opleiding: {type: Number, ref: 'Opleiding'},
+ startdatum: Date,
+ einddatum: Date,
+ geslaagd: Boolean
+ });*/
 
 var oplSchema = new Schema({
     oplCode: Number,
@@ -121,9 +121,9 @@ app.post('/api/cursisten', function (req, res) {
         email: req.body.email,
         telnr: req.body.telnr,
         foto: req.body.foto
-        //opleidingen: req.body.opleidingen
+                //opleidingen: req.body.opleidingen
     }, function (err, cursist) {
-        if (err)
+        /*if (err)
         {
             console.log(err);
             return res.send(err);
@@ -134,7 +134,8 @@ app.post('/api/cursisten', function (req, res) {
             if (err)
                 return res.send(err);
             res.json(cursisten);
-        });
+        });*/
+    res.json(cursist);
     });
 }
 );
@@ -217,20 +218,59 @@ app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
     });
 });
 
-app.get('/api/gevolgde/:cursist_id', function (req, res) {
-
-    // use mongoose to get all todos in the database
-    Gevolgde.find({cursist: req.params.cursist_id}, function (err, gevolgde) {
-
-        // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-        if (err)
-            res.send(err);
-
-        res.json(gevolgde); // return all todos in JSON format
-        //res.json({"test":"jaja"});
+/*app.get('/api/gevolgde/:cursist_id', function (req, res) {
+ 
+ // use mongoose to get all todos in the database
+ Gevolgde.find({cursist: req.params.cursist_id}, function (err, gevolgde) {
+ 
+ // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+ if (err)
+ res.send(err);
+ 
+ res.json(gevolgde); // return all todos in JSON format
+ //res.json({"test":"jaja"});
+ });
+ });*/
+app.get('/api/cursisten/:cursist_id/gevolgde/:oplCode', function (req, res) {
+    Cursist.findOne({IKLnr: req.params.cursist_id}, function (err, cursist) {
+        var i;
+        var found = false;
+        //console.log("cur" + cursist.opleidingen[0]);
+        for (i = 0; i < cursist.opleidingen.length; i++) {
+            if (cursist.opleidingen[i].opleidinginfo.oplCode == req.params.oplCode) {
+                //res.json(cursist);//hier bezig, als check of opl mag toegevoegd worden of niet
+                found = true;
+            } 
+        }
+        if(found){
+            res.json(cursist);
+        }else{
+            console.log("nope");
+            res.json({duplicate: "no"});
+        }
     });
 });
 
+app.delete('/api/cursisten/:cursist_id/gevolgde/:opl_id', function (req, res) {
+    Cursist.findByIdAndUpdate(
+            req.params.cursist_id,
+            {$pull: {"opleidingen": {"_id": req.params.opl_id}}},
+            function (err, cursist) {
+                if (err)
+                    console.log(err);
+                Cursist.findOne({_id: req.params.cursist_id},
+                        function (err, cursist) {
+                            if (err) {
+                                console.log(err);
+
+                            } else {
+                                console.log(cursist);
+                                res.json(cursist);
+                            }
+                        });
+            }
+    )
+});
 app.post('/api/gevolgde/:cursist_id', function (req, res) {
     /*Gevolgde.create({opleiding: req.body.oplCode, cursist: req.params.cursist_id}, function (err, gevolgdes) {
      if (err) {
