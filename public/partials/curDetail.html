@@ -26,7 +26,7 @@
     <ul>
         <li ng-repeat='opleiding in cursist.opleidingen'>
             <ul>
-                <li>{{ opleiding.opleidinginfo.oplCode }} - {{ opleiding.opleidinginfo.naam }}</li>
+                <li>{{ opleiding.opleiding.oplCode }} - {{ opleiding.opleiding.naam }}</li>
                 <li>Begindatum: {{ opleiding.startdatum | date : 'd-MM-yyyy' : '+0200' }}</li>
                 <li>Einddatum: {{ opleiding.einddatum | date : 'd-MM-yyyy' : '+0200' }}</li>
                 <li>Geslaagd: {{ opleiding.geslaagd }}</li>

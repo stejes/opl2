@@ -2,31 +2,26 @@
 
 // set up ========================
 var express = require('express');
-var app = express();                               // create our app w/ express
+var app = express(); // create our app w/ express
 var mongoose = require('mongoose'),
         Schema = mongoose.Schema,
-        autoIncrement = require('mongoose-auto-increment');                     // mongoose for mongodb
-var morgan = require('morgan');             // log requests to the console (express4)
-var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
+        autoIncrement = require('mongoose-auto-increment'); // mongoose for mongodb
+var morgan = require('morgan'); // log requests to the console (express4)
+var bodyParser = require('body-parser'); // pull information from HTML POST (express4)
 var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
 
 
 
 // configuration =================
 
-var connection = mongoose.connect('mongodb://localhost/eindtaak');     // connect to mongoDB database on modulus.io
+var connection = mongoose.connect('mongodb://localhost/eindtaak'); // connect to mongoDB database on modulus.io
 autoIncrement.initialize(connection);
-
-
-app.use(express.static(__dirname + '/public'));                 // set the static files location /public/img will be /img for users
-app.use(morgan('dev'));                                         // log every request to the console
-app.use(bodyParser.urlencoded({'extended': 'true'}));            // parse application/x-www-form-urlencoded
-app.use(bodyParser.json());                                     // parse application/json
+app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
+app.use(morgan('dev')); // log every request to the console
+app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
+app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride());
-
-
-
 /*var gevolgdeSchema = new Schema({
  //IKLnr: Number,
  //oplCode: Number,
@@ -43,13 +38,10 @@ var oplSchema = new Schema({
     beschrijving: String,
     duurtijd: Number
 });
-
-
-
 //curSchema.plugin(autoIncrement.plugin, {model: 'Opleiding', field: 'oplCode'});
 //define model
 
-var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
+
 //var Gevolgde = mongoose.model('Gevolgde', gevolgdeSchema, "gevolgde");
 var curSchema = new Schema({
     IKLnr: {type: Number/*, index: {unique: true, dropDups: true}*/},
@@ -61,15 +53,14 @@ var curSchema = new Schema({
     telnr: String,
     foto: String,
     opleidingen: [{
-            opleidinginfo: {type: Schema.Types.ObjectId, ref: oplSchema},
+            opleiding: {type: Schema.Types.ObjectId, ref: 'Opleiding'},
             startdatum: Date,
             einddatum: Date,
             geslaagd: Boolean}]
 });
-var Cursist = mongoose.model('Cursist', curSchema, "cursisten");
-
-
 curSchema.plugin(autoIncrement.plugin, {model: 'Cursist', field: 'IKLnr'});
+var Cursist = mongoose.model('Cursist', curSchema, "cursisten");
+var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
 
 // routes ======================================================================
 
@@ -85,22 +76,22 @@ app.get('/api/cursisten', function (req, res) {
         // if there is an error retrieving, send the error. nothing after res.send(err) will execute
         if (err)
             res.send(err);
-
         res.json(cursisten); // return all todos in JSON format
         //res.json({"test":"jaja"});
     });
 });
-
 app.get('/api/cursisten/:cursist_id', function (req, res) {
-Cursist
-        .findOne({IKLnr: req.params.cursist_id})
-        .populate({
-            path: 'opleidingen.opleidinginfo',
-            model: 'Opleiding'
-        })
+    Cursist
+            .findOne({IKLnr: req.params.cursist_id})
+            .populate({
+                path: "opleidingen.opleiding"
+                //model: 'Opleiding'
+            })
 
-        .exec(function (err, cursist) {
-        if (err) return handleError(err);
+            .exec(function (err, cursist) {
+                if (err)
+                    res.send(err);
+                //return handleError(err);
                 console.log('The creator is %s', cursist.opleidingen);
                 /*Cursist.findOne({IKLnr: req.params.cursist_id},
                  function (err, cursist) {
@@ -115,38 +106,38 @@ Cursist
                  }
                  
                  });*/
-            res.json(cursist);
-        });
+                res.json(cursist);
+            });
 });
 // create todo and send back all todos after creation
 app.post('/api/cursisten', function (req, res) {
 //console.log(req);
 // create a todo, information comes from AJAX request from Angular
-Cursist.create({
+    Cursist.create({
 //IKLnr: 11111,
-rijksregNr: req.body.rijksregNr,
+        rijksregNr: req.body.rijksregNr,
         familienaam: req.body.familienaam,
         voornaam: req.body.voornaam,
         adres: req.body.adres,
         email: req.body.email,
         telnr: req.body.telnr,
         foto: req.body.foto
-        //opleidingen: req.body.opleidingen
-}, function (err, cursist) {
-/*if (err)
- {
- console.log(err);
- return res.send(err);
- }
- //console.log(err);
- // get and return all the todos after you create another
- Cursist.find(function (err, cursisten) {
- if (err)
- return res.send(err);
- res.json(cursisten);
- });*/
-res.json(cursist);
-});
+                //opleidingen: req.body.opleidingen
+    }, function (err, cursist) {
+        /*if (err)
+         {
+         console.log(err);
+         return res.send(err);
+         }
+         //console.log(err);
+         // get and return all the todos after you create another
+         Cursist.find(function (err, cursisten) {
+         if (err)
+         return res.send(err);
+         res.json(cursisten);
+         });*/
+        res.json(cursist);
+    });
 }
 );
 // delete a todo
@@ -233,7 +224,7 @@ app.get('/api/cursisten/:cursist_id/gevolgde/:oplCode', function (req, res) {
         var found = false;
         //console.log("cur" + cursist.opleidingen[0]);
         for (i = 0; i < cursist.opleidingen.length; i++) {
-            if (cursist.opleidingen[i].opleidinginfo.oplCode == req.params.oplCode) {
+            if (cursist.opleidingen[i].opleiding.oplCode == req.params.oplCode) {
                 //res.json(cursist);//hier bezig, als check of opl mag toegevoegd worden of niet
                 found = true;
             }
@@ -288,9 +279,8 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
         var query = {'IKLnr': req.params.cursist_id};
         var startdate = Date.parse(req.body.startdatum);
         var enddate = startdate + parseInt(opleiding.duurtijd) * 7 * 24 * 60 * 60 * 1000;
-        Cursist.findOneAndUpdate(
-                query,
-                {$push: {"opleidingen": {"opleidinginfo": opleiding._id, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {safe: true, upsert: true},
+        Cursist.findOneAndUpdate(query, {
+            $push: {"opleidingen": {"opleiding": opleiding._id, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {safe: true, upsert: true},
                 function (err, cursisten) {
                     if (err) {
                         console.log(err);
@@ -306,7 +296,10 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
                                 });
                     }
                 }
-        )
+
+
+
+        );
     });
 });
 // application -------------------------------------------------------------
