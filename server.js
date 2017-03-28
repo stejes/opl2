@@ -85,7 +85,7 @@ app.get('/api/cursisten/:cursist_id', function (req, res) {
             .findOne({IKLnr: req.params.cursist_id})
             .populate({
                 path: "opleidingen.opleiding"
-                //model: 'Opleiding'
+                        //model: 'Opleiding'
             })
 
             .exec(function (err, cursist) {
@@ -150,6 +150,48 @@ app.delete('/api/cursisten/:cursist_id', function (req, res) {
         // get and return all the todos after you create another
         res.json(cursist);
     });
+});
+
+app.put('/api/cursisten/:cursist_id', function (req, res) {
+    Cursist.findOneAndUpdate({IKLnr: req.params.cursist_id},
+            {
+                $set: {opleidingen: function () {
+                        var opleidingen = [];
+
+                        angular.forEach(req.body.opleidingen, function ($opleiding) {
+                            var opleiding = {};
+                            opleiding.opleiding = $opleiding._id;
+                            opleiding.startdatum = $opleiding.startdatum;
+                            opleidingen.push(opleiding);
+                        });
+
+                        return opleidingen;
+                    }
+                }
+            }
+    )
+            .populate({
+                path: "opleidingen.opleiding"
+                        //model: 'Opleiding'
+            })
+            .exec(
+                    function (err, cursist) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            /*Cursist.findOne({IKLnr: req.params.cursist_id},
+                             function (err, cursist) {
+                             if (err) {
+                             console.log(err);
+                             } else {
+                             console.log(cursist);
+                             res.json(cursist);
+                             }
+                             });*/
+                            res.json(cursist);
+                        }
+                    }
+            );
 });
 // 
 // get all todos
@@ -241,22 +283,34 @@ app.delete('/api/cursisten/:cursist_id/gevolgde/:opl_id', function (req, res) {
     Cursist.findByIdAndUpdate(
             req.params.cursist_id,
             {$pull: {"opleidingen": {"_id": req.params.opl_id}}},
-            function (err, cursist) {
-                if (err)
-                    console.log(err);
-                Cursist.findOne({_id: req.params.cursist_id},
-                        function (err, cursist) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                console.log(cursist);
-                                res.json(cursist);
-                            }
-                        });
-            }
+            {new : true}
     )
+            .populate({
+                path: "opleidingen.opleiding"
+                        //model: 'Opleiding'
+            })
+            .exec(
+                    function (err, cursist) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            /*Cursist.findOne({IKLnr: req.params.cursist_id},
+                             function (err, cursist) {
+                             if (err) {
+                             console.log(err);
+                             } else {
+                             console.log(cursist);
+                             res.json(cursist);
+                             }
+                             });*/
+                            res.json(cursist);
+                        }
+                    }
+            );
+
+
 });
-app.post('/api/gevolgde/:cursist_id', function (req, res) {
+app.post('/api/cursisten/:cursist_id/opleidingen/:opleiding_id', function (req, res) {
     /*Gevolgde.create({opleiding: req.body.oplCode, cursist: req.params.cursist_id}, function (err, gevolgdes) {
      if (err) {
      res.send(err);
@@ -272,34 +326,63 @@ app.post('/api/gevolgde/:cursist_id', function (req, res) {
      
      });*/
 
-    Opleiding.findOne({oplCode: req.body.oplCode}, function (err, opleiding) {
+    Opleiding.findOne({_id: req.params.opleiding_id}, function (err, opleiding) {
 
         if (err)
             console.log(err);
         var query = {'IKLnr': req.params.cursist_id};
+
         var startdate = Date.parse(req.body.startdatum);
         var enddate = startdate + parseInt(opleiding.duurtijd) * 7 * 24 * 60 * 60 * 1000;
-        Cursist.findOneAndUpdate(query, {
-            $push: {"opleidingen": {"opleiding": opleiding._id, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {safe: true, upsert: true},
-                function (err, cursisten) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        Cursist.findOne({IKLnr: req.params.cursist_id},
-                                function (err, cursist) {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {
-                                        console.log(cursist);
-                                        res.json(cursist);
-                                    }
-                                });
-                    }
+        var valQuery = {
+            $or: [
+                {'startdatum': {$gt: startdate, $lt: enddate}},
+                {'einddatum': {$gt: startdate, $lt: enddate}},
+                {
+                    $and: [
+                        {'startdatum': {$lt: startdate}},
+                        {'einddatum': {$gt: enddate}}
+                    ]
+                },
+                {
+                    $and: [
+                        {'startdatum': {$gt: startdate}},
+                        {'einddatum': {$lt: enddate}}
+                    ]
                 }
+            ]
+        };/*hier bezig met conditionele query voor gevoglde toe te vogen*/
+        //Cursist.find()
+
+        Cursist.findOneAndUpdate(query, {
+            $push: {"opleidingen": {"opleiding": opleiding._id, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {new : true, safe: true, upsert: true}
 
 
 
-        );
+
+        )
+                .populate({
+                    path: "opleidingen.opleiding"
+                            //model: 'Opleiding'
+                })
+                .exec(
+                        function (err, cursist) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                /*Cursist.findOne({IKLnr: req.params.cursist_id},
+                                 function (err, cursist) {
+                                 if (err) {
+                                 console.log(err);
+                                 } else {
+                                 console.log(cursist);
+                                 res.json(cursist);
+                                 }
+                                 });*/
+                                res.json(cursist);
+                            }
+                        }
+                );
     });
 });
 // application -------------------------------------------------------------

@@ -56,8 +56,8 @@ oplApp.controller('mainController', ['$scope', '$http', 'cursistFactory', 'oplei
 
     }]);
 
-oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursistFactory', 'opleidingFactory', function ($scope, $routeParams, $http, $cursistFactory, $opleidingFactory) {
-        $scope.formData = {};
+oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursistFactory', 'opleidingFactory', 'gevolgdeFactory', function ($scope, $routeParams, $http, $cursistFactory, $opleidingFactory, $gevolgdeFactory) {
+        //$scope.formData = {};
         $scope.melding = "";
         console.log();
         /*$http.get('/api/cursisten/' + $routeParams.cursist_id)
@@ -81,13 +81,16 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursi
 
         $scope.createGevolgde = function () {
             $scope.melding = "";
-
-            $http.get('/api/cursisten/' + $routeParams.cursist_id + '/gevolgde/' + $scope.formData.oplCode)
+            //$scope.cursist.opleidingen.push({opleiding: $scope.formData.id, startdatum: $scope.formData.startdatum});
+            $scope.cursist = $gevolgdeFactory.save({curId: $routeParams.cursist_id, oplId: $scope.formData.id}, {startdatum: $scope.formData.startdatum});
+            //$cursistFactory.update({id: $routeParams.cursist_id}, $scope.cursist);
+            //$scope.cursist =  $cursistFactory.get({id: $routeParams.cursist_id});
+           /* $http.get('/api/cursisten/' + $routeParams.cursist_id + '/gevolgde/' + $scope.formData.oplCode)
                     .then(function (result) {
                         console.log("result: " + typeof (result) + " " + result.data);
                         if (result.data.duplicate == "no") {
                             console.log("jaja");
-                            $http.post('/api/gevolgde/' + $routeParams.cursist_id, $scope.formData)
+                            $http.post('/api/cursisten/' + $routeParams.cursist_id + '/opleidingen/' + $scope.formData.oplCode, $scope.formData)
                                     .then(function (res) {
                                         $scope.cursist = res.data;
                                         console.log(res);
@@ -99,9 +102,8 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursi
                         }
                     }), function (res) {
 
-                /*
-                 };*/
-            };
+               
+            };*/
             /**/
         };
 

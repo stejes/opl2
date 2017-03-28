@@ -44,8 +44,8 @@
                     <div class="form-group">
 
                         <!-- BIND THIS VALUE TO formData.text IN ANGULAR --> 
-                        <select class="form-control input-lg text-center" ng-model="formData.oplCode">
-                            <option ng-repeat='opleiding in opleidingen' value='{{ opleiding.oplCode }}'>{{ opleiding.naam }}
+                        <select class="form-control input-lg text-center" ng-model="formData.id">
+                            <option ng-repeat='opleiding in opleidingen' value='{{ opleiding._id }}'>{{ opleiding.naam }}
                                 
                             </option>
                         </select>
