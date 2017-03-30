@@ -2,22 +2,9 @@ oplApp.controller('mainController', ['$scope', '$http', 'cursistFactory', 'oplei
         //$scope.formData = {};
         $scope.formData = new $cursistFactory();
 
-        /*$http.get('/api/cursisten')
-         .then(function (res) {
-         $scope.cursisten = res.data;
-         console.log(res);
-         }, function (res) {
-         console.log('Error: ' + res.statusText);
-         });*/
+
         $scope.cursisten = $cursistFactory.query();
 
-        /*$http.get('/api/opleidingen')
-         .then(function (res) {
-         $scope.opleidingen = res.data;
-         console.log(res);
-         }, function (res) {
-         console.log('Error: ' + res.statusText);
-         });*/
 
         $scope.opleidingen = $opleidingFactory.query();
 
@@ -26,28 +13,15 @@ oplApp.controller('mainController', ['$scope', '$http', 'cursistFactory', 'oplei
 
             $scope.formData.$save();
             $scope.cursisten = $cursistFactory.query();
-            /*$http.post('/api/cursisten', $scope.formData)
-             .then(function (res) {
-             $scope.formData = {}; // clear the form so our user is ready to enter another
-             $scope.cursisten = res.data;
-             console.log(res);
-             }), function (res) {
-             console.log('Error: ' + res.statusText);
-             };*/
+
         };
 
 
 
         // delete a todo after checking it
         $scope.deleteCur = function (id) {
-            /*$http.delete('/api/cursisten/' + id)
-             .then(function (res) {
-             $scope.cursisten = res.data;
-             console.log(res.data);
-             }), function (res) {
-             console.log('Error: ' + res.statusText);
-             };*/
-            $cursistFactory.delete({id: id})
+
+            $cursistFactory.delete({id: id});
             $scope.cursisten = $cursistFactory.query();
         };
 
@@ -60,22 +34,10 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursi
         //$scope.formData = {};
         $scope.melding = "";
         console.log();
-        /*$http.get('/api/cursisten/' + $routeParams.cursist_id)
-         .then(function (res) {
-         $scope.cursist = res.data;
-         console.log(res);
-         }, function (res) {
-         console.log('Error: ' + res.statusText);
-         });*/
+
         $scope.cursist = $cursistFactory.get({id: $routeParams.cursist_id});
 
-        /* $http.get('/api/opleidingen')
-         .then(function (res) {
-         $scope.opleidingen = res.data;
-         console.log(res);
-         }, function (res) {
-         console.log('Error: ' + res.statusText);
-         });*/
+
 
         $scope.opleidingen = $opleidingFactory.query();
 
@@ -83,28 +45,7 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursi
             $scope.melding = "";
             //$scope.cursist.opleidingen.push({opleiding: $scope.formData.id, startdatum: $scope.formData.startdatum});
             $scope.cursist = $gevolgdeFactory.save({curId: $routeParams.cursist_id, oplId: $scope.formData.id}, {startdatum: $scope.formData.startdatum});
-            //$cursistFactory.update({id: $routeParams.cursist_id}, $scope.cursist);
-            //$scope.cursist =  $cursistFactory.get({id: $routeParams.cursist_id});
-           /* $http.get('/api/cursisten/' + $routeParams.cursist_id + '/gevolgde/' + $scope.formData.oplCode)
-                    .then(function (result) {
-                        console.log("result: " + typeof (result) + " " + result.data);
-                        if (result.data.duplicate == "no") {
-                            console.log("jaja");
-                            $http.post('/api/cursisten/' + $routeParams.cursist_id + '/opleidingen/' + $scope.formData.oplCode, $scope.formData)
-                                    .then(function (res) {
-                                        $scope.cursist = res.data;
-                                        console.log(res);
-                                    }), function (res) {
-                                console.log('Error: ' + res.statusText);
-                            };
-                        } else {
-                            $scope.melding = "Bestaat al";
-                        }
-                    }), function (res) {
 
-               
-            };*/
-            /**/
         };
 
         $scope.deleteGevolgde = function (curId, oplId) {
@@ -121,6 +62,14 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursi
             $scope.melding = "";
         };
 
+        $scope.maakGeslaagd = function (id, gevolgdeId) {
+            $scope.cursist = $cursistFactory.update({id: $routeParams.cursist_id}, {gevolgdeId: gevolgdeId});
+        }
+
+        $scope.editCursist = function () {
+            $scope.cursist = $cursistFactory.update({id: $routeParams.cursist_id}, $scope.cursist);
+        }
+
 
 
 
@@ -130,25 +79,12 @@ oplApp.controller('detailController', ['$scope', '$routeParams', '$http', 'cursi
 oplApp.controller('oplController', ['$scope', '$http', 'opleidingFactory', function ($scope, $http, $opleidingFactory) {
 
         $scope.formData = new $opleidingFactory();
-        /* $http.get('/api/opleidingen')
-         .then(function (res) {
-         $scope.opleidingen = res.data;
-         console.log(res);
-         }, function (res) {
-         console.log('Error: ' + res.statusText);
-         });*/
+
         $scope.opleidingen = $opleidingFactory.query();
 
         // when submitting the add form, send the text to the node API
         $scope.createOpl = function () {
-            /*$http.post('/api/opleidingen', $scope.formData)
-             .then(function (res) {
-             $scope.formData = {}; // clear the form so our user is ready to enter another
-             $scope.opleidingen = res.data;
-             console.log(res);
-             }), function (res) {
-             console.log('Error: ' + res.statusText);
-             };*/
+
 
             $scope.formData.$save();
             $scope.formData = {};
@@ -160,29 +96,19 @@ oplApp.controller('oplController', ['$scope', '$http', 'opleidingFactory', funct
 
         // delete a todo after checking it
         $scope.deleteOpl = function (id) {
-            /*$http.delete('/api/opleidingen/' + id)
-             .then(function (res) {
-             $scope.opleidingen = res.data;
-             console.log(res.data);
-             }), function (res) {
-             console.log('Error: ' + res.statusText);
-             };*/
+
             $opleidingFactory.delete({id: id})
             $scope.opleidingen = $opleidingFactory.query();
         };
         //$scope.formData = {};
+
+
     }]);
 
-oplApp.controller('oplDetailController', ['$scope', '$routeParams', '$http','opleidingFactory', function ($scope, $routeParams, $http, $opleidingFactory) {
-        //$scope.formData = {};
-        //console.log();
-        /*$http.get('/api/opleidingen/' + $routeParams.opleiding_id)
-                .then(function (res) {
-                    $scope.opleiding = res.data;
-                    console.log(res);
-                }, function (res) {
-                    console.log('Error: ' + res.statusText);
-                });*/
-         $scope.opleiding = $opleidingFactory.get({id: $routeParams.opleiding_id});
+oplApp.controller('oplDetailController', ['$scope', '$routeParams', '$http', 'opleidingFactory', function ($scope, $routeParams, $http, $opleidingFactory) {
 
+        $scope.opleiding = $opleidingFactory.get({id: $routeParams.opleiding_id});
+        $scope.editOpleiding = function () {
+            $scope.opleiding = $opleidingFactory.update({id: $routeParams.opleiding_id}, $scope.opleiding);
+        };
     }]);

@@ -9,7 +9,7 @@ oplApp.filter('filterOpl', function(){
         
         for(i=0; i<input.length;i++){
             for(j=0; j< input[i].opleidingen.length;j++){
-                if(input[i].opleidingen[j].opleidinginfo.oplCode == code){
+                if(input[i].opleidingen[j].opleiding.oplCode == code){
                     returnArr.push(input[i]);
                 }
             }

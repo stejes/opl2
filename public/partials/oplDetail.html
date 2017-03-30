@@ -16,4 +16,24 @@
         </li>
    
     </ul>
+     <form ng-model="opleiding">
+        <div class="form-group">
+        <label class="col-md-1" for="oplCode">OplCode</label>       
+        <input disabled type="text" name="oplCode" value="{{ opleiding.oplCode }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="naam">naam</label>
+        <input ng-model="opleiding.naam" type="text" name="naam" value="{{ opleiding.naam }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="beschrijving">beschrijving</label>
+        <input ng-model="opleiding.beschrijving" type="text" name="beschrijving" value="{{ opleiding.beschrijving }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="adres">duurtijd</label>
+        <input ng-model="opleiding.duurtijd" type="text" name="duurtijd" value="{{ opleiding.duurtijd }}">
+         </div>
+        
+        <button type="submit" ng-click="editOpleiding()" class="btn btn-default">Wijzigen</button>
+    </form>
 </div>

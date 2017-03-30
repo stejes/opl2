@@ -1,27 +1,34 @@
 <div class='container'>
     
    
-    <ul>
-        <li>
-            IKLnr: {{ cursist.IKLnr }}
-        </li>
-        <li>
-            Voornaam: {{ cursist.voornaam }}
-        </li>
-        <li>
-            Familienaam: {{ cursist.familienaam }}
-        </li>
-        <li>
-            adres: {{ cursist.adres }}
-        </li>
-        <li>
-            email: {{ cursist.email }}
-        </li>
-        <li>
-            foto: {{ cursist.foto }}
-        </li>
-        
-    </ul>
+  
+    <form ng-model="cursist">
+        <div class="form-group">
+        <label class="col-md-1" for="IKLnr">IKLnr</label>       
+        <input disabled type="text" name="IKLnr" value="{{ cursist.IKLnr }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="voornaam">voornaam</label>
+        <input ng-model="cursist.voornaam" type="text" name="voornaam" value="{{ cursist.voornaam }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="familienaam">familienaam</label>
+        <input ng-model="cursist.familienaam" type="text" name="familienaam" value="{{ cursist.familienaam }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="adres">adres</label>
+        <input ng-model="cursist.adres" type="text" name="adres" value="{{ cursist.adres }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="email">email</label>
+        <input ng-model="cursist.email" type="text" name="email" value="{{ cursist.email }}">
+         </div>
+         <div class="form-group">
+         <label class="col-md-1" for="foto">foto</label>
+        <input ng-model="cursist.foto" type="text" name="foto" value="{{ cursist.foto }}">
+         </div>
+        <button type="submit" ng-click="editCursist()" class="btn btn-default">Wijzigen</button>
+    </form>
     <h2>Gevolgde opleidingen: </h2>
     <ul>
         <li ng-repeat='opleiding in cursist.opleidingen'>
@@ -30,7 +37,7 @@
                 <li>Begindatum: {{ opleiding.startdatum | date : 'd-MM-yyyy' : '+0200' }}</li>
                 <li>Einddatum: {{ opleiding.einddatum | date : 'd-MM-yyyy' : '+0200' }}</li>
                 <li>Geslaagd: {{ opleiding.geslaagd }}</li>
-                <li><button name="removeBtn" class="btn btn-default" ng-click="deleteGevolgde(cursist._id, opleiding._id)">Verwijder</button></li>
+                <li><button name="removeBtn" class="btn btn-default" ng-click="deleteGevolgde(cursist._id, opleiding._id)">Verwijder</button> <button name="removeBtn" class="btn btn-default" ng-click="maakGeslaagd(cursist._id, opleiding._id)">Toggle geslaagd</button></li>
             </ul>
              
         </li>

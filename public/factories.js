@@ -29,13 +29,13 @@ oplApp.factory('opleidingFactory', ['$resource', function ($resource) {
                         method: 'PUT'
                     }
                 });
-        Opleiding.prototype.update = function (cb) {
+       /* Opleiding.prototype.update = function (cb) {
             return Opleiding.update({
                 id: this.id
             }, angular.extend({}, this, {
                 _id: undefined
             }), cb);
-        };
+        };*/
         return Opleiding;
     }]);
 

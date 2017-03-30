@@ -68,17 +68,36 @@ var Opleiding = mongoose.model('Opleiding', oplSchema, "opleidingen");
 // 
 // 
 // // get alle cursisten
+/*app.get('/api/cursisten', function (req, res) {
+ 
+ // use mongoose to get all todos in the database
+ Cursist.find(function (err, cursisten) {
+ 
+ // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+ if (err)
+ res.send(err);
+ res.json(cursisten); // return all todos in JSON format
+ //res.json({"test":"jaja"});
+ });
+ });*/
+
 app.get('/api/cursisten', function (req, res) {
 
     // use mongoose to get all todos in the database
-    Cursist.find(function (err, cursisten) {
+    Cursist.find()
+            .populate({
+                path: "opleidingen.opleiding"
+                        //model: 'Opleiding'
+            })
+            .exec(function (err, cursisten) {
 
-        // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-        if (err)
-            res.send(err);
-        res.json(cursisten); // return all todos in JSON format
-        //res.json({"test":"jaja"});
-    });
+                // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+                if (err)
+                    res.send(err);
+                res.json(cursisten); // return all todos in JSON format
+                //res.json({"test":"jaja"});
+            });
+
 });
 app.get('/api/cursisten/:cursist_id', function (req, res) {
     Cursist
@@ -153,45 +172,51 @@ app.delete('/api/cursisten/:cursist_id', function (req, res) {
 });
 
 app.put('/api/cursisten/:cursist_id', function (req, res) {
-    Cursist.findOneAndUpdate({IKLnr: req.params.cursist_id},
-            {
-                $set: {opleidingen: function () {
-                        var opleidingen = [];
+    if (req.body.gevolgdeId) {
+        Cursist.findOne({IKLnr: req.params.cursist_id})
+                .populate({
+                    path: "opleidingen.opleiding"
+                            //model: 'Opleiding'
+                })
+                .exec(function (err, cursist) {
 
-                        angular.forEach(req.body.opleidingen, function ($opleiding) {
-                            var opleiding = {};
-                            opleiding.opleiding = $opleiding._id;
-                            opleiding.startdatum = $opleiding.startdatum;
-                            opleidingen.push(opleiding);
-                        });
+                    for (var i = 0; i < cursist.opleidingen.length; i++) {
+                        if (cursist.opleidingen[i]._id == req.body.gevolgdeId) {
 
-                        return opleidingen;
-                    }
-                }
-            }
-    )
-            .populate({
-                path: "opleidingen.opleiding"
-                        //model: 'Opleiding'
-            })
-            .exec(
-                    function (err, cursist) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            /*Cursist.findOne({IKLnr: req.params.cursist_id},
-                             function (err, cursist) {
-                             if (err) {
-                             console.log(err);
-                             } else {
-                             console.log(cursist);
-                             res.json(cursist);
-                             }
-                             });*/
-                            res.json(cursist);
+                            if (cursist.opleidingen[i].geslaagd === false) {
+
+                                cursist.opleidingen[i].geslaagd = true;
+                            } else {
+                                cursist.opleidingen[i].geslaagd = false;
+                            }
+
                         }
+
                     }
-            );
+                    cursist.save();
+                    res.json(cursist);
+                });
+    } else {
+        console.log("erin");
+        Cursist.findOne({IKLnr: req.params.cursist_id})
+                .populate({
+                    path: "opleidingen.opleiding"
+                            //model: 'Opleiding'
+                })
+                .exec(function (err, cursist) {
+                    console.log("ook hierin" + req.body.voornaam);
+                    cursist.voornaam = req.body.voornaam;
+                    cursist.familienaam = req.body.familienaam;
+                    cursist.adres = req.body.adres;
+                    cursist.email = req.body.email;
+                    cursist.foto = req.body.foto;
+                    cursist.save();
+                    res.json(cursist);
+                }
+
+                )
+    }
+
 });
 // 
 // get all todos
@@ -236,6 +261,18 @@ app.post('/api/opleidingen', function (req, res) {
         res.json(opleiding);
     });
 });
+
+app.put('/api/opleidingen/:opleiding_id', function(req, res){
+   Opleiding.findOne({oplCode: req.params.oplCode}, function(err, opleiding){
+       console.log("nieuwe naam: " + opleiding.naam);
+       opleiding.naam= req.body.naam;
+       opleiding.beschrijving = req.body.beschrijving;
+       opleiding.duurtijd = req.body.duurtijd;
+       opleiding.save();
+       res.json(opleiding);
+   }) ;
+});
+
 // delete a todo
 app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
     Opleiding.remove({
@@ -260,25 +297,7 @@ app.delete('/api/opleidingen/:opleiding_id', function (req, res) {
  //res.json({"test":"jaja"});
  });
  });*/
-app.get('/api/cursisten/:cursist_id/gevolgde/:oplCode', function (req, res) {
-    Cursist.findOne({IKLnr: req.params.cursist_id}, function (err, cursist) {
-        var i;
-        var found = false;
-        //console.log("cur" + cursist.opleidingen[0]);
-        for (i = 0; i < cursist.opleidingen.length; i++) {
-            if (cursist.opleidingen[i].opleiding.oplCode == req.params.oplCode) {
-                //res.json(cursist);//hier bezig, als check of opl mag toegevoegd worden of niet
-                found = true;
-            }
-        }
-        if (found) {
-            res.json(cursist);
-        } else {
-            console.log("nope");
-            res.json({duplicate: "no"});
-        }
-    });
-});
+
 app.delete('/api/cursisten/:cursist_id/gevolgde/:opl_id', function (req, res) {
     Cursist.findByIdAndUpdate(
             req.params.cursist_id,
@@ -311,79 +330,69 @@ app.delete('/api/cursisten/:cursist_id/gevolgde/:opl_id', function (req, res) {
 
 });
 app.post('/api/cursisten/:cursist_id/opleidingen/:opleiding_id', function (req, res) {
-    /*Gevolgde.create({opleiding: req.body.oplCode, cursist: req.params.cursist_id}, function (err, gevolgdes) {
-     if (err) {
-     res.send(err);
-     } else {
-     Gevolgde.find(function (err, gevolgde) {
-     if (err) {
-     res.send(err);
-     } else {
-     res.json(gevolgde);
-     }
-     });
-     }
-     
-     });*/
+
+
 
     Opleiding.findOne({_id: req.params.opleiding_id}, function (err, opleiding) {
-
-        if (err)
-            console.log(err);
-        var query = {'IKLnr': req.params.cursist_id};
-
         var startdate = Date.parse(req.body.startdatum);
         var enddate = startdate + parseInt(opleiding.duurtijd) * 7 * 24 * 60 * 60 * 1000;
-        var valQuery = {
-            $or: [
-                {'startdatum': {$gt: startdate, $lt: enddate}},
-                {'einddatum': {$gt: startdate, $lt: enddate}},
-                {
-                    $and: [
-                        {'startdatum': {$lt: startdate}},
-                        {'einddatum': {$gt: enddate}}
-                    ]
-                },
-                {
-                    $and: [
-                        {'startdatum': {$gt: startdate}},
-                        {'einddatum': {$lt: enddate}}
-                    ]
-                }
-            ]
-        };/*hier bezig met conditionele query voor gevoglde toe te vogen*/
-        //Cursist.find()
 
-        Cursist.findOneAndUpdate(query, {
-            $push: {"opleidingen": {"opleiding": opleiding._id, "startdatum": startdate, "einddatum": enddate, geslaagd: false}}}, {new : true, safe: true, upsert: true}
-
-
-
-
-        )
+        Cursist.findOne({'IKLnr': req.params.cursist_id})
                 .populate({
                     path: "opleidingen.opleiding"
                             //model: 'Opleiding'
                 })
-                .exec(
-                        function (err, cursist) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                /*Cursist.findOne({IKLnr: req.params.cursist_id},
-                                 function (err, cursist) {
-                                 if (err) {
-                                 console.log(err);
-                                 } else {
-                                 console.log(cursist);
-                                 res.json(cursist);
-                                 }
-                                 });*/
-                                res.json(cursist);
-                            }
+                .exec(function (err, cursist) {
+                    //console.log(cursist.opleidingen[0].startdatum);
+                    invalid = false;
+                    for (var i = 0; i < cursist.opleidingen.length; i++) {
+                        console.log(cursist.opleidingen[i]);
+                        var opleiding = cursist.opleidingen[i];
+                        var startdatum = Date.parse(opleiding.startdatum);
+                        var einddatum = Date.parse(opleiding.einddatum);
+                        console.log("startdatum: " + startdatum);
+                        console.log("einddatum: " + einddatum);
+                        console.log("startdate: " + startdate);
+                        console.log("enddate: " + enddate);
+                        if (startdatum >= startdate && startdatum <= enddate) {
+                            invalid = true;
+                        } else if (opleiding.einddatum >= startdate && einddatum <=
+                                enddate) {
+                            invalid = true;
+                        } else if (startdatum <= startdate && einddatum >= enddate)
+                        {
+                            invalid = true;
                         }
-                );
+
+                    }
+
+                    console.log(cursist);
+                    if (invalid) {
+                        console.log('jajajajajajaajaj');
+
+                    } else {
+                        cursist.opleidingen.push({opleiding: req.params.opleiding_id, startdatum: startdate, einddatum: enddate, geslaagd: false});
+                        cursist.save();
+                        Cursist.populate(cursist, 'opleidingen.opleiding', function(err, cursist){
+                            res.json(cursist);
+                        });
+                       
+                    }
+
+
+                });
+
+
+
+
     });
+
+
+
+
+
+
+
 });
 // application -------------------------------------------------------------
 app.get('*.html', function (req, res) {
