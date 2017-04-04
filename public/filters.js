@@ -17,4 +17,4 @@ oplApp.filter('filterOpl', function(){
         }
         return returnArr;
     };
-})
+});

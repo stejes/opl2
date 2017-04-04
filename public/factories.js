@@ -25,10 +25,12 @@ oplApp.factory('opleidingFactory', ['$resource', function ($resource) {
         var Opleiding = $resource('/api/opleidingen/:id',
                 {
                     id: '@_id',
-                    update: {
+                },
+                {update: {
                         method: 'PUT'
                     }
-                });
+                }
+            );
        /* Opleiding.prototype.update = function (cb) {
             return Opleiding.update({
                 id: this.id

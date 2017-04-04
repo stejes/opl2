@@ -262,9 +262,9 @@ app.post('/api/opleidingen', function (req, res) {
     });
 });
 
-app.put('/api/opleidingen/:opleiding_id', function(req, res){
+app.put('/api/opleidingen/:oplCode', function(req, res){
    Opleiding.findOne({oplCode: req.params.oplCode}, function(err, opleiding){
-       console.log("nieuwe naam: " + opleiding.naam);
+       console.log("nieuwe naam: " + req.body.naam);
        opleiding.naam= req.body.naam;
        opleiding.beschrijving = req.body.beschrijving;
        opleiding.duurtijd = req.body.duurtijd;

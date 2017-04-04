@@ -10,9 +10,11 @@ oplApp.controller('mainController', ['$scope', '$http', 'cursistFactory', 'oplei
 
         // when submitting the add form, send the text to the node API
         $scope.createCur = function () {
-
+//$scope.formData = new $cursistFactory();
             $scope.formData.$save();
             $scope.cursisten = $cursistFactory.query();
+            $scope.formData = {};
+            $scope.formData = new $cursistFactory();
 
         };
 
@@ -87,9 +89,10 @@ oplApp.controller('oplController', ['$scope', '$http', 'opleidingFactory', funct
 
 
             $scope.formData.$save();
-            $scope.formData = {};
+            
             $scope.opleidingen = $opleidingFactory.query();
-
+            
+            $scope.formData = new $opleidingFactory();
         };
 
 
